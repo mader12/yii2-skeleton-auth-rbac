@@ -2,14 +2,9 @@
     <h1 align="center">Yii2 skeleton basic app with auth DB and RBAC</h1>
 </p>
 <p align="center">
-Стандартная yii2 скелетон бейсик приложение с добавленной авторизацие через базу данных (выполнить миграции)
-и с RBAC
-</p>
+Standart yii2 skeleton basic app with auth, signup, reset pass, RBAC.
 
-<p align="center">
-    <h2>ниже стандартная документация по установке</h2>
 </p>
-
 
 DIRECTORY STRUCTURE
 -------------------
@@ -47,7 +42,7 @@ git clone https://github.com/mader12/yii2-skeleton-auth-rbac.git
 composer install
 ~~~
 
-CONFIGURATION
+NEXT STEP CONFIGURATION
 -------------
 
 ### Database
@@ -64,7 +59,13 @@ return [
 ];
 ```
 
-### RBAC
+### NEXT 
+~~~
+./install.sh
+~~~
+
+
+### settings RBAC
 
 
 ~~~
