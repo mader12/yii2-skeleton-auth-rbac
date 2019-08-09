@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use D\D;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -135,9 +136,9 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionAbout()
+    public function actionLang()
     {
-        return $this->render('about');
+        return $this->render('lang');
     }
 
     /**

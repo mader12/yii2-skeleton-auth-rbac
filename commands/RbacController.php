@@ -15,10 +15,14 @@ class RbacController extends Controller
     {
         $auth = Yii::$app->authManager;
 
-        if ($auth->getRole('admin') !== null) {
-            echo 'roles already exists ' . PHP_EOL;
-            return true;
-        }
+        $auth->removeAll();
+        /*
+                if ($auth->getRole('admin') !== null) {
+                    echo 'roles already exists ' . PHP_EOL;
+                    return true;
+                }
+        */
+
         // Создадим роли админа и редактора новостей
         $admin = $auth->createRole('admin');
         $editor = $auth->createRole('editor');
@@ -27,6 +31,11 @@ class RbacController extends Controller
         $auth->add($admin);
         $auth->add($editor);
 
+        // Создаем наше правило, которое позволит проверить автора новости
+        $authorRule = new \app\common\rbac\AuthorRule;
+        // Запишем его в БД
+        $auth->add($authorRule);
+
         // Создаем разрешения. Например, просмотр админки viewAdminPage и редактирование новости updateNews
         $viewAdminPage = $auth->createPermission('viewAdminPage');
         $viewAdminPage->description = 'Просмотр админки';
@@ -34,13 +43,20 @@ class RbacController extends Controller
         $updateNews = $auth->createPermission('updateNews');
         $updateNews->description = 'Редактирование новости';
 
+        // Создадим еще новое разрешение «Редактирование собственной новости» и ассоциируем его с правилом AuthorRule
+        $updateOwnNews = $auth->createPermission('updateOwnNews');
+        $updateOwnNews->description = 'Редактирование собственной новости';
+        // Указываем правило AuthorRule для разрешения updateOwnNews.
+        $updateOwnNews->ruleName = $authorRule->name;
+
         // Запишем эти разрешения в БД
         $auth->add($viewAdminPage);
         $auth->add($updateNews);
+        $auth->add($updateOwnNews);
+
 
         // Теперь добавим наследования. Для роли editor мы добавим разрешение updateNews,
         // а для админа добавим наследование от роли editor и еще добавим собственное разрешение viewAdminPage
-
         // Роли «Редактор новостей» присваиваем разрешение «Редактирование новости»
         $auth->addChild($editor, $updateNews);
 

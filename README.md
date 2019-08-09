@@ -94,7 +94,7 @@ RBAC дает возможность очень гибко работать с �
 <?php
 namespace common\rbac;
 
-class AuthorRule extends yii\rbac\Rule
+class AuthorRule extends \yii\rbac\Rule
 {
     public $name = 'isAuthor';
 
@@ -116,7 +116,7 @@ class AuthorRule extends yii\rbac\Rule
 ~~~
 <?php
 
-namespace console\controllers;
+namespace app\commands;
 
 use Yii;
 use yii\console\Controller;
@@ -139,7 +139,7 @@ class RbacController extends Controller {
         $auth->add($editor);
         
         // Создаем наше правило, которое позволит проверить автора новости
-        $authorRule = new \app\rbac\AuthorRule;
+        $authorRule = new \app\common\rbac\AuthorRule;
         
         // Запишем его в БД
         $auth->add($authorRule);

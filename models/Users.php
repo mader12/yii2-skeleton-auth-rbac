@@ -3,7 +3,7 @@
 namespace app\models;
 
 use Yii;
-use yii\behaviors\TimestampBehavior;
+use app\behaviors\DatetimeBehavior;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
@@ -12,14 +12,13 @@ use yii\web\IdentityInterface;
  *
  * @property integer $id
  * @property string $username
- * @property string $password_hash
+ * @property string $password
  * @property string $password_reset_token
  * @property string $email
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at
  * @property integer $updated_at
- * @property string $password write-only password
  */
 class Users extends ActiveRecord implements IdentityInterface
 {
@@ -40,7 +39,7 @@ class Users extends ActiveRecord implements IdentityInterface
     public function behaviors()
     {
         return [
-            TimestampBehavior::className(),
+            DatetimeBehavior::className(),
         ];
     }
 
@@ -54,6 +53,7 @@ class Users extends ActiveRecord implements IdentityInterface
             [['created_at', 'updated_at'], 'safe'],
             [['username', 'email', 'password'], 'string', 'max' => 255],
             [['email'], 'unique'],
+            [['email'], 'email'],
             ['status', 'default', 'value' => self::STATUS_ACTIVE],
             ['status', 'in', 'range' => [self::STATUS_ACTIVE, self::STATUS_DELETED]],
         ];
@@ -163,8 +163,9 @@ class Users extends ActiveRecord implements IdentityInterface
      */
     public function validatePassword($password)
     {
-        return Yii::$app->security->validatePassword($password, $this->password_hash);
+        return Yii::$app->security->validatePassword($password, $this->password);
     }
+
     /**
      * Generates password hash from password and sets it to the model
      *
@@ -172,7 +173,7 @@ class Users extends ActiveRecord implements IdentityInterface
      */
     public function setPassword($password)
     {
-        $this->password_hash = Yii::$app->security->generatePasswordHash($password);
+        $this->password = Yii::$app->security->generatePasswordHash($password);
     }
     /**
      * Generates "remember me" authentication key
@@ -194,5 +195,26 @@ class Users extends ActiveRecord implements IdentityInterface
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
+    }
+
+    /**
+     * After save method
+     * @param bool $insert
+     * @param array $changedAttributes
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        parent::afterSave($insert, $changedAttributes);
+
+        if ($insert) {
+            $auth = Yii::$app->authManager;
+            $editor = $auth->getRole('editor'); // Получаем роль editor
+            $auth->assign($editor, $this->id); // Назначаем пользователю, которому принадлежит модель User
+        }
+    }
+
+    public function beforeSave($insert)
+    {
+        return parent::beforeSave($insert);
     }
 }

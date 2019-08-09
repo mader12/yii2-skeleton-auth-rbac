@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use D\D;
 use Yii;
 use yii\base\Model;
 
@@ -44,6 +45,7 @@ class LoginForm extends Model
      */
     public function validatePassword($attribute, $params)
     {
+
         if (!$this->hasErrors()) {
             $user = $this->getUser();
 
@@ -62,6 +64,7 @@ class LoginForm extends Model
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
         }
+
         return false;
     }
 
